@@ -1,4 +1,23 @@
 #!/usr/bin/env python3
+"""\
+A script to download pads from pads.zapf.in that are linked in pages.
+
+Call this e.g. as
+
+    download_pads.py -cat:SoSe23
+
+to download the Markdown files that are in pages that have the category
+"SoSe23".
+
+Files will be placed into directories below the output directory (see below)
+named by the page title with one file per pad link, named "padname.md".
+
+The following parameters are supported:
+
+-outdir           The directory to put the markdown files in, defaults to wikipads
+
+"""
+
 import re
 import urllib.parse
 

@@ -21,3 +21,16 @@ damit das families file gefunden wird, dann einfach die Zahl des ZaPFwikis
 auswählen, bei der Sprache `de` wählen, den eigenen Nutzernamen eingeben, nicht
 mit anderen Projekten verbinden, Ja zum Botpasswort, dann Nutzernamen und
 Passwort für den Bot angeben und den Rest kann man getrost verneinen.
+
+## Mehr Skripte schreiben
+
+Beispiele gibt es in `scripts/`, in [der
+Doku](https://doc.wikimedia.org/pywikibot/stable/library_usage.html) und in den
+[Beispielskripten von
+pywikibot](https://doc.wikimedia.org/pywikibot/stable/scripts/index.html).
+
+Skripte benötigen einen Moduldocstring damit Hilfeaufrufe mit `-help` möglich
+sind. pywikibot benutzt eine etwas eigene Syntax für
+Kommandozeilenargument. Optionen beginnen mit einem Bindestrich gefolgt von
+einem Wort, z.B. `-help`, und etwaige Werte werden durch einen Doppelpunkt
+getrennt angehängt, z.B. `-option:wert`.
