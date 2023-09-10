@@ -95,10 +95,9 @@ class PadFinderBot(pwb.bot.ExistingPageBot):
                 [*shlex.split(editor), os.fspath(mergefile), os.fspath(padfile)]
             )
             if not filecmp.cmp(contentfile, mergefile):
-                pwb.logging.info(f"Merge file content differs from current content.")
+                pwb.logging.info(f"Merge file content differs from current content. Writing back.")
                 newtext = mergefile.read_text()
-                summary = pwb.input("Summary", default=f"Merge content from {url.removesuffix('/download')}")
-                pwb.logging.info("Saving ")
+                summary = pwb.input("Edit summary", default=f"Merge content from {url.removesuffix('/download')}")
                 self.put_current(newtext, summary=summary)
 
 
