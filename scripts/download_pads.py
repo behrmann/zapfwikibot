@@ -14,7 +14,8 @@ named by the page title with one file per pad link, named "padname.md".
 
 The following parameters are supported:
 
--outdir           The directory to put the markdown files in, defaults to wikipads
+-outdir           The directory to put the markdown files in,
+                  defaults to "wikipads".
 
 """
 
@@ -83,7 +84,7 @@ def main():
         if opt in ("outdir",):
             if not val:
                 pywikibot.input(f"Please enter a value for {arg}")
-            options[opt] = val
+            options[opt] = Path(val)
     PadFinderBot(generator=gen_factory.getCombinedGenerator(), **options).run()
 
 
