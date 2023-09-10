@@ -34,3 +34,7 @@ sind. pywikibot benutzt eine etwas eigene Syntax für
 Kommandozeilenargument. Optionen beginnen mit einem Bindestrich gefolgt von
 einem Wort, z.B. `-help`, und etwaige Werte werden durch einen Doppelpunkt
 getrennt angehängt, z.B. `-option:wert`.
+
+### Links
+
+- [pagegenerator options](https://doc.wikimedia.org/pywikibot/stable/api_ref/pywikibot.pagegenerators.html#generator-options)
