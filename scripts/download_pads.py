@@ -17,9 +17,23 @@ The following parameters are supported:
 -outdir           The directory to put the markdown files in,
                   defaults to "wikipads".
 
+-withcontent      Also download the content of the wikipage that contained
+                  a padlink.
+
+-merge            Additionally create a file "merge.wiki" containing the content
+                  of the page and opens both this file and the markdown file
+                  with an editor. If the merge and content file differ, the
+                  content of the merge file will be saved as the new page
+                  content. Implies -withcontent.
+
+-always           The bot won't ask for confirmation when putting a page
 """
 
+import filecmp
+import os
 import re
+import shlex
+import subprocess
 import urllib.parse
 
 import mwparserfromhell
@@ -34,8 +48,11 @@ from pathlib import Path
 
 class PadFinderBot(pwb.bot.ExistingPageBot):
     """Check if a page contains a pad link and download it"""
-    update_options = {
-        "outdir": Path("wikipads")
+    available_options = {
+        "outdir": Path("wikipads"),
+        "withcontent": False,
+        "merge": False,
+        "always": False,
     }
 
     padmatcher = re.compile('(?P<padlink>https?://pad\.zapf\.in/(?P<padname>[^/#\?\s]+))')
@@ -48,7 +65,7 @@ class PadFinderBot(pwb.bot.ExistingPageBot):
             if m := self.padmatcher.match(str(link.url)):
                 padlink = m.group("padlink")
                 padname = m.group("padname")
-                outfile = outdir / f"{padname}.md"
+                padfile = outdir / f"{padname}.md"
                 pwb.logging.info(f"Found padlink {padlink}")
                 for base in ["https://pads.zapf.in", "https://broken-pads.zapf.in"]:
                     url = urllib.parse.urljoin(base, "/".join([padname, "download"]))
@@ -61,9 +78,28 @@ class PadFinderBot(pwb.bot.ExistingPageBot):
                     pwb.logging.error(f"{padname} had no content on either pads.zapf.in nor broken-pads.zapf.in")
                     continue
 
-                pwb.logging.info(f"Saving {padname} to {outfile}")
+                pwb.logging.info(f"Saving {padname} to {padfile}")
                 outdir.mkdir(exist_ok=True, parents=True)
-                outfile.write_text(padcontent)
+                padfile.write_text(padcontent)
+
+        if (self.opt.withcontent or self.opt.merge) and outdir.is_dir():
+            contentfile = outdir / "content.wiki"
+            pwb.logging.info(f"Saving page content to {contentfile}")
+            contentfile.write_text(text)
+
+        editor = os.getenv("VISUAL") or os.getenv("EDITOR")
+        if self.opt.merge and editor:
+            mergefile = outdir / "merge.wiki"
+            mergefile.write_text(text)
+            subprocess.run(
+                [*shlex.split(editor), os.fspath(mergefile), os.fspath(padfile)]
+            )
+            if not filecmp.cmp(contentfile, mergefile):
+                pwb.logging.info(f"Merge file content differs from current content.")
+                newtext = mergefile.read_text()
+                summary = pwb.input("Summary", default=f"Merge content from {url.removesuffix('/download')}")
+                pwb.logging.info("Saving ")
+                self.put_current(newtext, summary=summary)
 
 
 def main():
@@ -85,6 +121,8 @@ def main():
             if not val:
                 pywikibot.input(f"Please enter a value for {arg}")
             options[opt] = Path(val)
+        elif opt in ("withcontent", "merge", "always"):
+            options[opt] = True
     PadFinderBot(generator=gen_factory.getCombinedGenerator(), **options).run()
 
 
