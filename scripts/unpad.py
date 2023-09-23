@@ -102,6 +102,9 @@ class PadFinderBot(pwb.bot.ExistingPageBot):
 
 
 def main():
+    site = pywikibot.Site("de", "zapfwiki")
+    site.login()
+
     """Parse command line arguments and invoke bot."""
     options = {}
     # Can handle arguments to construct generator that yields pages,
